@@ -1,0 +1,22 @@
+{
+    "authors": [
+        {
+            "name": "Kampfmoehre",
+            "role": "CREATOR"
+        }
+    ],
+    "description": "Shows the highest speed a vehicle has actually reached next to the top speed of its consist, e.g. \"133 km/h / 140 km/h\": a row in every vehicle window, and in every line window the highest speed on that line with the vehicle that reached it. Green once the top speed is reached.\n\nUseful to see whether a fast vehicle is ever driven at its top speed on a given line, or whether a cheaper, slower one would do.\n\nSpeeds are sampled every two seconds while the game runs and are kept for the session; after loading a game the measurement starts again. No measurable performance cost (tested with 400 vehicles). Purely cosmetic, achievements stay enabled.",
+    "name": "Top Speed Reached",
+    "summary": "Highest speed actually reached, per vehicle and per line",
+    "tags": [
+        "Script Mod"
+    ],
+    "url": "",
+    "localization": {
+        "de": {
+            "name": "Erreichte Höchstgeschwindigkeit",
+            "summary": "Tatsächlich erreichte Höchstgeschwindigkeit je Fahrzeug und Linie",
+            "description": "Zeigt die höchste tatsächlich erreichte Geschwindigkeit eines Fahrzeugs neben der Höchstgeschwindigkeit seines Verbands, z. B. „133 km/h / 140 km/h“: als Zeile in jedem Fahrzeugfenster und in jedem Linienfenster die höchste Geschwindigkeit auf dieser Linie samt dem Fahrzeug, das sie erreicht hat. Grün, sobald die Höchstgeschwindigkeit erreicht wurde.\n\nHilfreich, um zu sehen, ob ein schnelles Fahrzeug auf einer Linie je ausgefahren wird oder ob ein günstigeres, langsameres reichen würde.\n\nGemessen wird alle zwei Sekunden im laufenden Spiel, die Werte gelten für die Sitzung; nach dem Laden eines Spielstands beginnt die Messung neu. Keine messbaren Leistungskosten (getestet mit 400 Fahrzeugen). Rein kosmetisch, Achievements bleiben aktiv."
+        }
+    }
+}

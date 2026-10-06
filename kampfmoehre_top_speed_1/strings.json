@@ -1,0 +1,14 @@
+{
+    "en": {
+        "Top speed reached": "Top speed reached",
+        "top_speed_na": "not measured yet",
+        "top_speed_line_tooltip": "Highest speed measured on this line since the game was loaded: {speed} by {vehicle}.",
+        "top_speed_vehicle_tooltip": "Highest speed measured for this vehicle since the game was loaded, and the consist's top speed. Green when the top speed has been reached. Speeds are sampled every few seconds, short peaks may be missed."
+    },
+    "de": {
+        "Top speed reached": "Erreichte Höchstgeschwindigkeit",
+        "top_speed_na": "noch nicht gemessen",
+        "top_speed_line_tooltip": "Höchste auf dieser Linie gemessene Geschwindigkeit seit dem Laden des Spiels: {speed} von {vehicle}.",
+        "top_speed_vehicle_tooltip": "Höchste für dieses Fahrzeug gemessene Geschwindigkeit seit dem Laden des Spiels und die Höchstgeschwindigkeit des Verbands. Grün, wenn die Höchstgeschwindigkeit erreicht wurde. Es wird alle paar Sekunden gemessen, kurze Spitzen können fehlen."
+    }
+}
