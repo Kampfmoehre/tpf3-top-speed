@@ -13,7 +13,7 @@
 -- Loaded via react-plugin resources; .script.lua files export via data().
 
 function data()
-	local VERSION = "0.3.1"
+	local VERSION = "0.3.2"
 
 	local SAMPLE_INTERVAL = 2   -- seconds between speed samples
 	local LIST_INTERVAL = 10    -- seconds between refreshes of the vehicle list
@@ -57,6 +57,23 @@ function data()
 		end
 	end
 
+	-- Fingerprint of a vehicle's consist (model ids). Replacing a vehicle keeps
+	-- the entity but swaps the consist, so a changed fingerprint means the
+	-- measured maximum belongs to a different vehicle and must be reset.
+	local function consistKey(vehicle)
+		local ids = {}
+		pcall(function()
+			local tv = api.engine.getComponent(vehicle, api.type.ComponentType.TRANSPORT_VEHICLE)
+			if not tv then return end
+			for _, part in ipairs_native(tv.transportVehicleConfig.vehicles) do
+				ids[#ids + 1] = tostring(part.part.modelId)
+			end
+		end)
+		return table.concat(ids, ",")
+	end
+
+	local topSpeedCache = {}
+
 	local function sample()
 		sinceList = sinceList + SAMPLE_INTERVAL
 		if sinceList >= LIST_INTERVAL then
@@ -67,8 +84,13 @@ function data()
 			local ok, speed = pcall(api.engine.util.vehicle.getSpeed, v)
 			if ok and type(speed) == "number" and speed > 0 then
 				local rec = maxSpeed[v]
+				local key = consistKey(v)
+				if rec ~= nil and rec.key ~= key then
+					rec = nil -- consist was replaced/modified: start over
+					topSpeedCache[v] = nil
+				end
 				if rec == nil then
-					maxSpeed[v] = { speed = speed, line = vehicleLine[v] }
+					maxSpeed[v] = { speed = speed, line = vehicleLine[v], key = key }
 				elseif speed > rec.speed then
 					rec.speed = speed
 					rec.line = vehicleLine[v]
@@ -79,7 +101,6 @@ function data()
 
 	-- Top speed of a vehicle's consist incl. maintenance penalty, as the
 	-- condition card shows it (vehicle_eow.script.tl VehicleInfoDetails).
-	local topSpeedCache = {}
 	local function consistTopSpeed(vehicle)
 		local cached = topSpeedCache[vehicle]
 		if cached and cached.until_ > os.time() then return cached.speed end

@@ -5,7 +5,7 @@
             "role": "CREATOR"
         }
     ],
-    "description": "Shows the highest speed a vehicle has actually reached next to the top speed of its consist, e.g. \"133 km/h / 140 km/h\": a row in every vehicle window, and in every line window the highest speed on that line with the vehicle that reached it. Green once the top speed is reached.\n\nUseful to see whether a fast vehicle is ever driven at its top speed on a given line, or whether a cheaper, slower one would do.\n\nSpeeds are sampled every two seconds while the game runs and are kept for the session; after loading a game the measurement starts again. No measurable performance cost (tested with 400 vehicles). Purely cosmetic, achievements stay enabled.",
+    "description": "Adds a line to vehicle windows showing the last measured top speed.\n\nThe line window also gets a display of the highest speed reached on that line.\n\nUseful to find out if tracks/roads need to be improved or if vehicles with lower top speed would suffice.\n\nThe speed is only measured every 2 seconds for performance reasons and is not saved. So after loading it may take a while until the display is correct again.\n\nPure UI change, so achievements remain enabled.",
     "name": "Top Speed Reached",
     "summary": "Highest speed actually reached, per vehicle and per line",
     "tags": [
@@ -16,7 +16,7 @@
         "de": {
             "name": "Erreichte Höchstgeschwindigkeit",
             "summary": "Tatsächlich erreichte Höchstgeschwindigkeit je Fahrzeug und Linie",
-            "description": "Zeigt die höchste tatsächlich erreichte Geschwindigkeit eines Fahrzeugs neben der Höchstgeschwindigkeit seines Verbands, z. B. „133 km/h / 140 km/h“: als Zeile in jedem Fahrzeugfenster und in jedem Linienfenster die höchste Geschwindigkeit auf dieser Linie samt dem Fahrzeug, das sie erreicht hat. Grün, sobald die Höchstgeschwindigkeit erreicht wurde.\n\nHilfreich, um zu sehen, ob ein schnelles Fahrzeug auf einer Linie je ausgefahren wird oder ob ein günstigeres, langsameres reichen würde.\n\nGemessen wird alle zwei Sekunden im laufenden Spiel, die Werte gelten für die Sitzung; nach dem Laden eines Spielstands beginnt die Messung neu. Keine messbaren Leistungskosten (getestet mit 400 Fahrzeugen). Rein kosmetisch, Achievements bleiben aktiv."
+            "description": "Fügt dem Fahrzeugfenster eine Zeile hinzu, die die zuletzt gemessene Höchstgeschwindigkeit anzeigt.\n\nDas Linienfenster erhält ebenfalls die Anzeige der höchsten Geschwindigkeit die auf dieser Linie erreicht wurde.\n\nNützlich um heraus zu finden, ob Gleise/Straßen verbessert werden müssen oder ob Fahrzeuge mit niedrigerer Höchstgeschwindigkeit ausreichen würden.\n\nDie Geschwindigkeit wird aus Performance Gründen nur alle 2 Sekunden gemessen und nicht mit gespeichert. Nach dem Laden dauert es also ggf. eine Weile bis die Anzeige wieder korrekt ist.\n\nReine UI Änderung, also bleiben Erfolge aktiviert."
         }
     }
 }
