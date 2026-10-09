@@ -13,7 +13,7 @@
 -- Loaded via react-plugin resources; .script.lua files export via data().
 
 function data()
-	local VERSION = "0.3.2"
+	local VERSION = "0.3.3"
 
 	local SAMPLE_INTERVAL = 2   -- seconds between speed samples
 	local LIST_INTERVAL = 10    -- seconds between refreshes of the vehicle list
@@ -65,7 +65,9 @@ function data()
 		pcall(function()
 			local tv = api.engine.getComponent(vehicle, api.type.ComponentType.TRANSPORT_VEHICLE)
 			if not tv then return end
-			for _, part in ipairs_native(tv.transportVehicleConfig.vehicles) do
+			-- getComponent returns plain tables; ipairs_native expects a C++ vector
+			-- (it calls :at) and would fail silently inside this pcall
+			for _, part in ipairs(tv.transportVehicleConfig.vehicles) do
 				ids[#ids + 1] = tostring(part.part.modelId)
 			end
 		end)
