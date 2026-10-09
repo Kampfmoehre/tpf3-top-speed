@@ -5,7 +5,7 @@
             "role": "CREATOR"
         }
     ],
-    "description": "Adds a line to vehicle windows showing the last measured top speed.\n\nThe line window also gets a display of the highest speed reached on that line.\n\nUseful to find out if tracks/roads need to be improved or if vehicles with lower top speed would suffice.\n\nThe speed is only measured every 2 seconds for performance reasons and is not saved. So after loading it may take a while until the display is correct again.\n\nPure UI change, so achievements remain enabled.",
+    "description": "Adds a line to vehicle windows showing the last measured top speed.\n\nThe line window also gets a display of the highest speed reached on that line.\n\nUseful to find out if tracks/roads need to be improved or if vehicles with lower top speed would suffice.\n\nThe speed is only measured every 2 seconds for performance reasons and is not saved. So after loading it may take a while until the display is correct again.\n\nPure UI change, so achievements remain enabled and the mod can safely be rmeoved from save games.\n\nDisclaimer: The mod was created with the help of LLMs, the code was checked and tested by me.",
     "name": "Top Speed Reached",
     "summary": "Highest speed actually reached, per vehicle and per line",
     "tags": [
@@ -16,7 +16,7 @@
         "de": {
             "name": "Erreichte Höchstgeschwindigkeit",
             "summary": "Tatsächlich erreichte Höchstgeschwindigkeit je Fahrzeug und Linie",
-            "description": "Fügt dem Fahrzeugfenster eine Zeile hinzu, die die zuletzt gemessene Höchstgeschwindigkeit anzeigt.\n\nDas Linienfenster erhält ebenfalls die Anzeige der höchsten Geschwindigkeit die auf dieser Linie erreicht wurde.\n\nNützlich um heraus zu finden, ob Gleise/Straßen verbessert werden müssen oder ob Fahrzeuge mit niedrigerer Höchstgeschwindigkeit ausreichen würden.\n\nDie Geschwindigkeit wird aus Performance Gründen nur alle 2 Sekunden gemessen und nicht mit gespeichert. Nach dem Laden dauert es also ggf. eine Weile bis die Anzeige wieder korrekt ist.\n\nReine UI Änderung, also bleiben Erfolge aktiviert."
+            "description": "Fügt dem Fahrzeugfenster eine Zeile hinzu, die die zuletzt gemessene Höchstgeschwindigkeit anzeigt.\n\nDas Linienfenster erhält ebenfalls die Anzeige der höchsten Geschwindigkeit die auf dieser Linie erreicht wurde.\n\nNützlich um heraus zu finden, ob Gleise/Straßen verbessert werden müssen oder ob Fahrzeuge mit niedrigerer Höchstgeschwindigkeit ausreichen würden.\n\nDie Geschwindigkeit wird aus Performance Gründen nur alle 2 Sekunden gemessen und nicht mit gespeichert. Nach dem Laden dauert es also ggf. eine Weile bis die Anzeige wieder korrekt ist.\n\nReine UI Änderung, also bleiben Erfolge aktiviert und die Mod kann problemlos wieder entfernt werden.\n\nDisclaimer: Die Mod wurde mit Hilfe Hilfe von LLMs erstellt, der Code wurde von mir überprüft und getestet."
         }
     }
 }
