@@ -10,10 +10,15 @@
 -- is refreshed less often (LIST_INTERVAL). For ~400 vehicles that is ~200
 -- calls/s, less than a single open line window spends on its emission row.
 --
+-- Track speed limit (param track_limit, default On): track_limits.lua reads
+-- the speed limits of the sections the line's vehicles drive and the rows show
+-- the highest one; "reached" then compares against min(consist, track). With
+-- the param Off no path or transport-network data is read at all.
+--
 -- Loaded via react-plugin resources; .script.lua files export via data().
 
 function data()
-	local VERSION = "0.3.3"
+	local VERSION = "0.4.0"
 
 	local SAMPLE_INTERVAL = 2   -- seconds between speed samples
 	local LIST_INTERVAL = 10    -- seconds between refreshes of the vehicle list
@@ -23,6 +28,7 @@ function data()
 	local content_card = ug_require "::/gui/main/content_card.tl"
 	local lang_util = ug_require "::/scripts/lang_util.tl"
 	local vehicle_store_util = ug_require "::/gui/line_vehicle_mgmt/vehicle_store_util.tl"
+	local track_limits = ug_require "kampfmoehre_top_speed_1::/gui/kampfmoehre_top_speed/track_limits.lua"
 
 	-- measured >= this share of the consist's top speed counts as "reached"
 	-- (samples every SAMPLE_INTERVAL s miss short peaks, so not 100 %)
@@ -33,6 +39,7 @@ function data()
 	local vehicles = {}        -- current list of player vehicles (entities)
 	local vehicleLine = {}     -- vehicle -> line
 	local sinceList = LIST_INTERVAL
+	local tracks = nil         -- shared track_limits collector, nil if the param is Off
 
 	local function refreshVehicleList()
 		local okP, player = pcall(api.engine.util.getPlayer)
@@ -82,6 +89,7 @@ function data()
 			sinceList = 0
 			refreshVehicleList()
 		end
+		if tracks then tracks:step(vehicles, vehicleLine, os.time()) end
 		for _, v in ipairs(vehicles) do
 			local ok, speed = pcall(api.engine.util.vehicle.getSpeed, v)
 			if ok and type(speed) == "number" and speed > 0 then
@@ -115,7 +123,7 @@ function data()
 			speed = data and (data.speedAdjusted or data.speed) or nil
 			if speed == math.huge then speed = nil end
 		end)
-		if not ok then log.warning("[top_speed] top speed lookup failed: " .. tostring(err)) end
+		if not ok then log.warning("[kampfmoehre_top_speed] top speed lookup failed: " .. tostring(err)) end
 		topSpeedCache[vehicle] = { speed = speed, until_ = os.time() + 30 }
 		return speed
 	end
@@ -171,36 +179,97 @@ function data()
 		function()
 			react.onMount(function()
 				maxSpeed, vehicles, vehicleLine, sinceList = {}, {}, {}, LIST_INTERVAL
-				log.message("[top_speed] v" .. VERSION .. " sampler started (every " .. SAMPLE_INTERVAL .. " s)")
+				local ok, all = pcall(api.engine.config.getModParams)
+				local mine = ok and type(all) == "table" and all["kampfmoehre_top_speed_1"] or nil
+				local trackEnabled = not (type(mine) == "table" and mine.track_limit == 1)
+				tracks = nil
+				if trackEnabled then
+					local okT, shared = pcall(track_limits.getShared, builtin, track_limits.engineAdapter, "kampfmoehre_top_speed")
+					if okT then
+						tracks = shared
+						tracks:reset()
+					else
+						log.warning("[kampfmoehre_top_speed] track limits unavailable: " .. tostring(shared))
+					end
+				end
+				log.message("[kampfmoehre_top_speed] v" .. VERSION .. " sampler started (every " .. SAMPLE_INTERVAL .. " s), track limit: "
+					.. tostring(tracks ~= nil) .. " (param track_limit=" .. tostring(type(mine) == "table" and mine.track_limit or mine) .. ")"
+					.. (tracks and (", collector API " .. tostring(tracks.API_VERSION) .. " from " .. tostring(tracks.owner)) or ""))
 			end)
 			react.onStepTimer(function()
 				local ok, err = pcall(sample)
-				if not ok then log.warning("[top_speed] sample failed: " .. tostring(err)) end
+				if not ok then log.warning("[kampfmoehre_top_speed] sample failed: " .. tostring(err)) end
 			end, SAMPLE_INTERVAL)
 			return builtin.BoxLayout{ children = {} }
 		end)
 
-	-- "131 km/h / 140 km/h" plus whether the top speed counts as reached
-	local function speedLabel(measured, top)
-		if measured <= 0 then return _("top_speed_na"), false end
-		if top and top > 0 then
-			return formatSpeed(measured) .. " / " .. formatSpeed(top), measured >= top * REACHED_FRACTION
+	-- "131 / 140 km/h" (unit once if both strings end in the same unit)
+	local function speedPair(a, b)
+		local sa, sb = formatSpeed(a), formatSpeed(b)
+		local num, unit = sa:match("^(.-)%s*(%a[%a/]*)$")
+		if num and num ~= "" and unit and sb:sub(-#unit) == unit then return num .. " / " .. sb end
+		return sa .. " / " .. sb
+	end
+
+	-- { max = m/s, known = n, total = n } of a line's track, nil if unknown or Off.
+	-- Called by open windows, so their line's sections are read first.
+	local function trackInfo(line)
+		if not tracks or not line then return nil end
+		pcall(tracks.want, tracks, line, os.time())
+		local ok, max, known, total = pcall(tracks.lineTrackMax, tracks, line)
+		if not ok or not max then return nil end
+		return { max = max, known = known, total = total, complete = total ~= nil and known >= total }
+	end
+
+	local function sameTrack(a, b)
+		if a == nil or b == nil then return a == b end
+		return a.max == b.max and a.known == b.known and a.total == b.total
+	end
+
+	-- "131 / 140 km/h · track 120 km/h" plus whether the top speed counts as
+	-- reached: against min(consist, track) once all sections are known
+	local function speedLabel(measured, top, track)
+		local label, reached
+		if measured <= 0 then
+			label, reached = _("top_speed_na"), false
+		elseif top and top > 0 then
+			local ref = top
+			if track and track.complete and track.max < ref then ref = track.max end
+			label, reached = speedPair(measured, top), measured >= ref * REACHED_FRACTION
+		else
+			label, reached = formatSpeed(measured), false
 		end
-		return formatSpeed(measured), false
+		if track then
+			label = label .. " · " .. lang_util.format(_(track.complete and "top_speed_track" or "top_speed_track_partial"),
+				{ speed = formatSpeed(track.max) })
+		end
+		return label, reached
+	end
+
+	local function trackTooltip(track)
+		if not track then return "" end
+		return "\n" .. lang_util.format(_("top_speed_track_tooltip"), {
+			speed = formatSpeed(track.max), known = track.known, total = track.total or "?" })
 	end
 
 	-- Vehicle window row
 	M.VehiclePlugin = react.RegisterPluginRecipe(
 		{ id = "::VehicleEowExtensionPoint" }, "KampfmoehreTopSpeedVehicle",
 		function(params)
-			local state = react.useState(0)
-			react.onStepTimer(function()
+			local function current()
 				local rec = maxSpeed[params.entityId]
-				local v = rec and rec.speed or 0
-				if v ~= state:old() then state:set(v) end
+				local line = vehicleLine[params.entityId] or (rec and rec.line)
+				return { speed = rec and rec.speed or 0, track = trackInfo(line) }
+			end
+			local state = react.useState(current())
+			react.onStepTimer(function()
+				local now, old = current(), state:old()
+				if now.speed ~= old.speed or not sameTrack(now.track, old.track) then state:set(now) end
 			end, 1)
-			local label, reached = speedLabel(state:old(), consistTopSpeed(params.entityId))
-			return makeRow(_("Top speed reached") .. ": " .. label, _("top_speed_vehicle_tooltip"), params, reached)
+			local s = state:old()
+			local label, reached = speedLabel(s.speed, consistTopSpeed(params.entityId), s.track)
+			return makeRow(_("top_speed_reached_short") .. ": " .. label,
+				_("top_speed_vehicle_tooltip") .. trackTooltip(s.track), params, reached)
 		end)
 
 	-- Line window row: max over the line's vehicles
@@ -208,9 +277,10 @@ function data()
 		{ id = "::LineEowExtensionPoint" }, "KampfmoehreTopSpeedLine",
 		function(params)
 			local function lineMax()
-				local best, bestVehicle, top = 0, nil, 0
+				local best, bestVehicle, top, count = 0, nil, 0, 0
 				local ok, vs = pcall(api.engine.system.transportVehicleSystem.getLineVehicles, params.entityId)
 				if ok and type(vs) == "table" then
+					count = #vs
 					for _, v in ipairs(vs) do
 						local rec = maxSpeed[v]
 						if rec and rec.speed > best then best, bestVehicle = rec.speed, v end
@@ -218,19 +288,23 @@ function data()
 						if t and t > top then top = t end
 					end
 				end
-				return { speed = best, vehicle = bestVehicle, top = top }
+				return { speed = best, vehicle = bestVehicle, top = top, count = count, track = trackInfo(params.entityId) }
 			end
 			local state = react.useState(lineMax())
 			react.onStepTimer(function()
 				local now = lineMax()
 				local old = state:old()
-				if now.speed ~= old.speed or now.vehicle ~= old.vehicle or now.top ~= old.top then state:set(now) end
+				if now.speed ~= old.speed or now.vehicle ~= old.vehicle or now.top ~= old.top or now.count ~= old.count
+					or not sameTrack(now.track, old.track) then state:set(now) end
 			end, 1)
 			local s = state:old()
-			local label, reached = speedLabel(s.speed, s.top)
+			if s.count == 0 then
+				return makeRow(_("top_speed_reached_short") .. ": " .. _("top_speed_no_vehicles"), _("top_speed_vehicle_tooltip"), params, false)
+			end
+			local label, reached = speedLabel(s.speed, s.top, s.track)
 			local tooltip = (s.speed > 0) and lang_util.format(_("top_speed_line_tooltip"), {
 				speed = formatSpeed(s.speed), vehicle = entityName(s.vehicle) }) or _("top_speed_vehicle_tooltip")
-			return makeRow(_("Top speed reached") .. ": " .. label, tooltip, params, reached)
+			return makeRow(_("top_speed_reached_short") .. ": " .. label, tooltip .. trackTooltip(s.track), params, reached)
 		end)
 
 	return M

@@ -1,15 +1,19 @@
 # Top Speed Reached (Transport Fever 3)
 
 A small UI mod for Transport Fever 3 that shows the **highest speed a vehicle
-has actually reached**, next to the top speed its consist is capable of:
+has actually reached**, next to the top speed its consist is capable of and
+the highest speed limit of the line's track:
 
-    Top speed reached: 133 km/h / 140 km/h
+    Reached: 97 / 115 km/h · track 100 km/h
 
 - In every vehicle window, as a row below the noise and pollution line.
 - In every line window: the highest speed on that line, with the vehicle that
   reached it in the tooltip, against the highest top speed among the line's
   vehicles.
-- The text turns green once the measured speed reaches 97 % of the top speed.
+- The text turns green once the measured speed reaches 97 % of the top speed,
+  or of the track's speed limit if that is lower (once all sections of the line
+  are known; until then it reads "track ≥ …").
+- Lines without vehicles show "no vehicles".
 - Useful to see whether a fast vehicle is ever driven at its top speed on a
   given line, or whether a cheaper, slower one would do.
 - Purely cosmetic, achievements stay enabled. English and German.
@@ -25,6 +29,11 @@ session. Consequences:
   below the real maximum. That is why green starts at 97 %, not 100 %.
 - Cost: one speed query per vehicle every two seconds. Measured on a save
   with 402 vehicles: no visible difference in frame rate or CPU load.
+- The track speed limit is read section by section while vehicles drive it
+  (about 3 ms of reading every 2 s, lines with an open window first; each
+  section again after 5 minutes). It can be
+  turned off with the mod option "Track speed limit"; then no track data is
+  read at all.
 
 There is deliberately no red or yellow state. A tram reaching 51 of 80 km/h
 is fine in a city and wasteful on a rural line, and the mod cannot tell the
@@ -60,17 +69,33 @@ resources:
   card uses: `vehicle_store_util.makeMultipleVehiclesFromParts` on the
   vehicle's parts and `collectVehicleData` with the vehicle's maintenance
   modifiers, cached for 30 s per vehicle.
+- Track speed limit (`track_limits.lua`): a vehicle's `MOVE_PATH` component
+  holds exactly the section it is driving, from the previous stop to the stop
+  `TransportVehicle.stopIndex` (identical for all vehicles of a line; at a
+  terminal only the short path inside the station, so only `EN_ROUTE`
+  vehicles are read). Each path edge points into a `TRANSPORT_NETWORK`
+  component whose edge carries `speedLimit` and `curveSpeedLimit` (m/s; tree
+  avenues already carry the halved value). Per edge the smaller of the two
+  counts; a section's limit is the highest speed that holds for at least
+  `MIN_RUN` (200 m, half the section if it is shorter) at a stretch, so a
+  crossing at 40 km/h in a 20 km/h avenue does not count. One
+  long section (400+ edges) costs up to ~40 ms, most cost 0.2-4 ms, hence
+  the time budget per step (`TIME_BUDGET`, at least one section). The collector is shared with Line Rate Preview through
+  the field `kampfmoehre_track_limits` of the `builtin` module table, which
+  all GUI scripts share (the copy with the highest `API_VERSION` wins;
+  `rawget`/`rawset` do not exist in the GUI Lua state), so with both mods every section is read only once.
 - Green uses the game's `success` text class (the `positive` class is the
   blue used for money).
 
 Tunables at the top of `top_speed.script.lua`: `SAMPLE_INTERVAL`,
-`LIST_INTERVAL`, `REACHED_FRACTION`.
+`LIST_INTERVAL`, `REACHED_FRACTION`; in `track_limits.lua`:
+`TIME_BUDGET`, `MAX_SECTIONS_PER_STEP`, `MAX_AGE`, `MIN_RUN`.
 
 ## Development
 
 ```
 kampfmoehre_top_speed_1/           the mod (this is what gets published)
-  mod.json                         mod id
+  mod.json                         mod id, option "Track speed limit"
   strings.json                     translations (en, de)
   _metadata/modinfo.json           name, summary, description (+ de)
   _metadata/0.png                  title image, 1920x1080
@@ -78,6 +103,8 @@ kampfmoehre_top_speed_1/           the mod (this is what gets published)
     entry.res.lua                  sampler registration (entry point)
     vehicle.res.lua, line.res.lua  row registrations
     top_speed.script.lua           the actual code
+    track_limits.lua               track speed limits per line section
+test/track_limits_test.lua         unit tests (luajit test/track_limits_test.lua)
 sync.sh                            copies the mod into the game's staging area
 ```
 
@@ -90,7 +117,7 @@ Workflow:
    the savegame is enough to pick up changes, no restart needed.
 3. Lua errors show up as a red error screen in the game ("Copy to clipboard")
    and in `.../3493540/local/crash_dump/stdout.txt`. The script logs with the
-   prefix `[top_speed]`. The game's Lua is 5.1-compatible; check syntax with
+   prefix `[kampfmoehre_top_speed]`. The game's Lua is 5.1-compatible; check syntax with
    `luajit -bl file.lua`, not `luac` 5.4.
 4. Before uploading a new version through the in-game Mod-Hub, increase
    `revision` in `mod.json`. mod.io rejects a package whose content is

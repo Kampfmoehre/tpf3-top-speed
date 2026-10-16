@@ -1,14 +1,30 @@
 {
     "en": {
-        "Top speed reached": "Top speed reached",
+        "top_speed_reached_short": "Reached",
         "top_speed_na": "not measured yet",
-        "top_speed_line_tooltip": "Highest speed measured on this line since the game was loaded: {speed} by {vehicle}.",
-        "top_speed_vehicle_tooltip": "Highest speed measured for this vehicle since the game was loaded, and the consist's top speed. Green when the top speed has been reached. Speeds are sampled every few seconds, short peaks may be missed."
+        "top_speed_no_vehicles": "no vehicles",
+        "top_speed_track": "track {speed}",
+        "top_speed_track_partial": "track ≥ {speed}",
+        "top_speed_line_tooltip": "Highest measured speed on this line: {speed} ({vehicle}).",
+        "top_speed_vehicle_tooltip": "Highest measured speed / top speed of the consist. Green from 97 % of it, or of the track limit if that is lower.\nSampled every 2 s since the game was loaded, short peaks may be missed.",
+        "top_speed_track_tooltip": "Track: highest limit (incl. curves) that holds for 200 m at a stretch; {known} of {total} sections known.",
+        "top_speed_track_param_name": "Track speed limit",
+        "top_speed_track_param_tooltip": "Shows the highest speed limit of the line's track next to the measured speed. Reads the track of the sections the vehicles drive (about 3 ms every 2 seconds). Turn off if it costs too much performance.",
+        "top_speed_param_off": "Off",
+        "top_speed_param_on": "On"
     },
     "de": {
-        "Top speed reached": "Erreichte Höchstgeschwindigkeit",
+        "top_speed_reached_short": "Erreicht",
         "top_speed_na": "noch nicht gemessen",
-        "top_speed_line_tooltip": "Höchste auf dieser Linie gemessene Geschwindigkeit seit dem Laden des Spiels: {speed} von {vehicle}.",
-        "top_speed_vehicle_tooltip": "Höchste für dieses Fahrzeug gemessene Geschwindigkeit seit dem Laden des Spiels und die Höchstgeschwindigkeit des Verbands. Grün, wenn die Höchstgeschwindigkeit erreicht wurde. Es wird alle paar Sekunden gemessen, kurze Spitzen können fehlen."
+        "top_speed_no_vehicles": "keine Fahrzeuge",
+        "top_speed_track": "Strecke {speed}",
+        "top_speed_track_partial": "Strecke ≥ {speed}",
+        "top_speed_line_tooltip": "Höchste gemessene Geschwindigkeit auf dieser Linie: {speed} ({vehicle}).",
+        "top_speed_vehicle_tooltip": "Höchste gemessene Geschwindigkeit / Höchstgeschwindigkeit des Verbands. Grün ab 97 % davon bzw. vom Streckenlimit, falls das niedriger ist.\nGemessen alle 2 s seit dem Laden, kurze Spitzen können fehlen.",
+        "top_speed_track_tooltip": "Strecke: höchstes Limit (inkl. Kurven), das 200 m am Stück gilt; {known} von {total} Abschnitten bekannt.",
+        "top_speed_track_param_name": "Streckenlimit",
+        "top_speed_track_param_tooltip": "Zeigt neben der gemessenen Geschwindigkeit das höchste Tempolimit der Strecke der Linie. Liest dafür die Abschnitte, die die Fahrzeuge befahren (etwa 3 ms alle 2 Sekunden). Ausschalten, falls es zu viel Leistung kostet.",
+        "top_speed_param_off": "Aus",
+        "top_speed_param_on": "An"
     }
 }

@@ -4,7 +4,19 @@
     "incompatibilities": null,
     "modId": "kampfmoehre_top_speed_1",
     "options": null,
-    "params": null,
+    "params": [
+        {
+            "defaultIndex": 1,
+            "key": "track_limit",
+            "name": "top_speed_track_param_name",
+            "tooltip": "top_speed_track_param_tooltip",
+            "uiType": "Button",
+            "values": [
+                "top_speed_param_off",
+                "top_speed_param_on"
+            ]
+        }
+    ],
     "postRunScript": {
         "fileName": ""
     },
