@@ -31,7 +31,8 @@ session. Consequences:
   with 402 vehicles: no visible difference in frame rate or CPU load.
 - The track speed limit is read section by section while vehicles drive it
   (about 3 ms of reading every 2 s, lines with an open window first; each
-  section again after 5 minutes). It can be
+  section again after 5 minutes, or when its line's window is opened, so a
+  track upgrade shows within seconds once a vehicle drives the section). It can be
   turned off with the mod option "Track speed limit"; then no track data is
   read at all.
 
@@ -80,7 +81,10 @@ resources:
   `MIN_RUN` (200 m, half the section if it is shorter) at a stretch, so a
   crossing at 40 km/h in a 20 km/h avenue does not count. One
   long section (400+ edges) costs up to ~40 ms, most cost 0.2-4 ms, hence
-  the time budget per step (`TIME_BUDGET`, at least one section). The collector is shared with Line Rate Preview through
+  the time budget per step (`TIME_BUDGET`, at least one section). Windows
+  call `want(line)` every second while open; a `want` after more than
+  `WANT_SECONDS` without one counts as opening the window and marks the line's
+  sections stale (old values stay shown until re-read). The collector is shared with Line Rate Preview through
   the field `kampfmoehre_track_limits` of the `builtin` module table, which
   all GUI scripts share (the copy with the highest `API_VERSION` wins;
   `rawget`/`rawset` do not exist in the GUI Lua state), so with both mods every section is read only once.
@@ -99,6 +103,7 @@ kampfmoehre_top_speed_1/           the mod (this is what gets published)
   strings.json                     translations (en, de)
   _metadata/modinfo.json           name, summary, description (+ de)
   _metadata/0.png                  title image, 1920x1080
+  _metadata/1.png, 2.png           gallery (2.png: vehicle window with track limit)
   content/gui/kampfmoehre_top_speed/
     entry.res.lua                  sampler registration (entry point)
     vehicle.res.lua, line.res.lua  row registrations

@@ -18,7 +18,7 @@
 -- Loaded via react-plugin resources; .script.lua files export via data().
 
 function data()
-	local VERSION = "0.4.0"
+	local VERSION = "0.4.1"
 
 	local SAMPLE_INTERVAL = 2   -- seconds between speed samples
 	local LIST_INTERVAL = 10    -- seconds between refreshes of the vehicle list
