@@ -10,9 +10,10 @@ the highest speed limit of the line's track:
 - In every line window: the highest speed on that line, with the vehicle that
   reached it in the tooltip, against the highest top speed among the line's
   vehicles.
-- The text turns green once the measured speed reaches 97 % of the top speed,
-  or of the track's speed limit if that is lower (once all sections of the line
-  are known; until then it reads "track ≥ …").
+- The text turns green once the measured speed reaches 97 % of the consist's
+  own top speed. If it runs at a track limit below that (once all sections of
+  the line are known; until then it reads "track ≥ …"), the text stays normal
+  and the track limit is highlighted: an upgrade of the track would help.
 - Lines without vehicles show "no vehicles".
 - Useful to see whether a fast vehicle is ever driven at its top speed on a
   given line, or whether a cheaper, slower one would do.
@@ -94,6 +95,25 @@ resources:
 Tunables at the top of `top_speed.script.lua`: `SAMPLE_INTERVAL`,
 `LIST_INTERVAL`, `REACHED_FRACTION`; in `track_limits.lua`:
 `TIME_BUDGET`, `MAX_SECTIONS_PER_STEP`, `MAX_AGE`, `MIN_RUN`.
+
+### Per section
+
+The card can be expanded (arrow on the card, like the game's own cards) to a
+table with one row per section of the line, numbered by its stops as in the
+line window (`1 → 2`, …, `n → 1`): the steepest climb (mean uphill grade
+over the steepest 200 m in travel direction, from the track heights; `–`
+below 0.5 %; an average would hide a ramp on a section that goes up and down
+again), the highest speed measured on that section as a bar (filled to its
+share of min(consist top speed, track limit)) and the section's track limit
+(highest limit that holds for 200 m, see above). Colours: green when the
+consist reached its own top speed (97 %); when it reached a track limit below
+its top speed the bar stays blue and the track limit is highlighted (an
+upgrade of the track would help); yellow below 50 %. In
+the vehicle window the row of the section the vehicle is driving is highlighted. The sampler keeps the maximum per section as well, keyed by the stop
+the vehicle is heading to (`TransportVehicle.stopIndex`, only while en route);
+the vehicle window shows that vehicle, the line window the maximum over the
+line's vehicles. `–` for sections not driven or read yet since loading. The
+collapsed row looks as before.
 
 ## Development
 

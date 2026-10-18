@@ -6,12 +6,18 @@
         "top_speed_track": "track {speed}",
         "top_speed_track_partial": "track ≥ {speed}",
         "top_speed_line_tooltip": "Highest measured speed on this line: {speed} ({vehicle}).",
-        "top_speed_vehicle_tooltip": "Highest measured speed / top speed of the consist. Green from 97 % of it, or of the track limit if that is lower.\nSampled every 2 s since the game was loaded, short peaks may be missed.",
+        "top_speed_vehicle_tooltip": "Highest measured speed / top speed of the consist. Green from 97 % of it. A highlighted track limit holds the consist back below its top speed (an upgrade of the track would help).\nSampled every 2 s since the game was loaded, short peaks may be missed.\nExpand the card for the speeds per section.",
         "top_speed_track_tooltip": "Track: highest limit (incl. curves) that holds for 200 m at a stretch; {known} of {total} sections known.",
         "top_speed_track_param_name": "Track speed limit",
         "top_speed_track_param_tooltip": "Shows the highest speed limit of the line's track next to the measured speed. Reads the track of the sections the vehicles drive (about 3 ms every 2 seconds). Turn off if it costs too much performance.",
         "top_speed_param_off": "Off",
-        "top_speed_param_on": "On"
+        "top_speed_param_on": "On",
+        "top_speed_col_section": "Section",
+        "top_speed_col_reached": "Reached",
+        "top_speed_col_track": "Track",
+        "top_speed_no_sections": "The line has no stops.",
+        "top_speed_col_grade": "Climb",
+        "top_speed_col_track_tooltip": "Highest speed limit (incl. curves) that holds for 200 m at a stretch (half the section if it is shorter). A short faster piece, e.g. before a stop, does not count, so the measured speed can be higher."
     },
     "de": {
         "top_speed_reached_short": "Erreicht",
@@ -20,11 +26,17 @@
         "top_speed_track": "Strecke {speed}",
         "top_speed_track_partial": "Strecke ≥ {speed}",
         "top_speed_line_tooltip": "Höchste gemessene Geschwindigkeit auf dieser Linie: {speed} ({vehicle}).",
-        "top_speed_vehicle_tooltip": "Höchste gemessene Geschwindigkeit / Höchstgeschwindigkeit des Verbands. Grün ab 97 % davon bzw. vom Streckenlimit, falls das niedriger ist.\nGemessen alle 2 s seit dem Laden, kurze Spitzen können fehlen.",
+        "top_speed_vehicle_tooltip": "Höchste gemessene Geschwindigkeit / Höchstgeschwindigkeit des Verbands. Grün ab 97 % davon. Ein hervorgehobenes Streckenlimit bremst den Verband unter seine Höchstgeschwindigkeit (ein Ausbau der Strecke würde helfen).\nGemessen alle 2 s seit dem Laden, kurze Spitzen können fehlen.\nKarte aufklappen für das Tempo pro Abschnitt.",
         "top_speed_track_tooltip": "Strecke: höchstes Limit (inkl. Kurven), das 200 m am Stück gilt; {known} von {total} Abschnitten bekannt.",
         "top_speed_track_param_name": "Streckenlimit",
         "top_speed_track_param_tooltip": "Zeigt neben der gemessenen Geschwindigkeit das höchste Tempolimit der Strecke der Linie. Liest dafür die Abschnitte, die die Fahrzeuge befahren (etwa 3 ms alle 2 Sekunden). Ausschalten, falls es zu viel Leistung kostet.",
         "top_speed_param_off": "Aus",
-        "top_speed_param_on": "An"
+        "top_speed_param_on": "An",
+        "top_speed_col_section": "Abschnitt",
+        "top_speed_col_reached": "Erreicht",
+        "top_speed_col_track": "Strecke",
+        "top_speed_no_sections": "Die Linie hat keine Halte.",
+        "top_speed_col_grade": "Steigung",
+        "top_speed_col_track_tooltip": "Höchstes Tempolimit (inkl. Kurven), das 200 m am Stück gilt (bei kürzeren Abschnitten die halbe Länge). Ein kurzes schnelleres Stück, z. B. vor einer Haltestelle, zählt nicht, deshalb kann das gemessene Tempo darüber liegen."
     }
 }
