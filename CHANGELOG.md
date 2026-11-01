@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 (2026-11-01)
+
+- Fix: a replaced or modified vehicle kept showing the old consist's measured and top speed while it
+  stood at the terminal; the record is now dropped within 2 seconds, not only once it moves again.
+
 ## 0.5.1 (2026-10-18)
 
 - Fix: expanding the card crashed the game ("Item of Component must be a layout", from the tooltip on the

@@ -23,7 +23,7 @@
 -- Loaded via react-plugin resources; .script.lua files export via data().
 
 function data()
-	local VERSION = "0.5.1"
+	local VERSION = "0.5.2"
 
 	local SAMPLE_INTERVAL = 2   -- seconds between speed samples
 	local LIST_INTERVAL = 10    -- seconds between refreshes of the vehicle list
@@ -35,6 +35,7 @@ function data()
 	local vehicle_store_util = ug_require "::/gui/line_vehicle_mgmt/vehicle_store_util.tl"
 	local track_limits = ug_require "kampfmoehre_top_speed_1::/gui/kampfmoehre_top_speed/track_limits.lua"
 	local section_rows = ug_require "kampfmoehre_top_speed_1::/gui/kampfmoehre_top_speed/section_rows.lua"
+	local speed_records = ug_require "kampfmoehre_top_speed_1::/gui/kampfmoehre_top_speed/speed_records.lua"
 
 	-- measured >= this share of the consist's top speed counts as "reached"
 	-- (samples every SAMPLE_INTERVAL s miss short peaks, so not 100 %)
@@ -98,27 +99,17 @@ function data()
 		if tracks then tracks:step(vehicles, vehicleLine, os.time()) end
 		for _, v in ipairs(vehicles) do
 			local ok, speed = pcall(api.engine.util.vehicle.getSpeed, v)
-			if ok and type(speed) == "number" and speed > 0 then
+			local rec = maxSpeed[v]
+			-- standing vehicles are only read while they have a record, so a
+			-- replaced vehicle drops its old maximum before it moves again
+			if ok and type(speed) == "number" and (speed > 0 or rec ~= nil) then
 				local okT, tv = pcall(api.engine.getComponent, v, api.type.ComponentType.TRANSPORT_VEHICLE)
 				if not okT then tv = nil end
-				local rec = maxSpeed[v]
-				local key = consistKey(tv)
-				if rec ~= nil and rec.key ~= key then
-					rec = nil -- consist was replaced/modified: start over
-					topSpeedCache[v] = nil
-				end
-				if rec == nil then
-					rec = { speed = speed, line = vehicleLine[v], key = key, sections = {}, sectionsLine = vehicleLine[v] }
-					maxSpeed[v] = rec
-				elseif speed > rec.speed then
-					rec.speed = speed
-					rec.line = vehicleLine[v]
-				end
-				-- per section; a vehicle moved to another line starts over
-				if rec.sectionsLine ~= vehicleLine[v] then
-					rec.sections, rec.sectionsLine = {}, vehicleLine[v]
-				end
-				if tv and tv.state == api.type.enum.TransportVehicleState.EN_ROUTE then
+				local reset
+				rec, reset = speed_records.update(rec, speed, consistKey(tv), vehicleLine[v])
+				if reset then topSpeedCache[v] = nil end
+				maxSpeed[v] = rec
+				if rec and speed > 0 and tv and tv.state == api.type.enum.TransportVehicleState.EN_ROUTE then
 					section_rows.record(rec.sections, tv.stopIndex, speed)
 				end
 			end
